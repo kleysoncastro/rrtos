@@ -1,7 +1,12 @@
-//stap-1 0 base RTOS
-
+//stap-2 0 base RTOS
+//
+// A periodic timer of 1 ms (SYSTIMER) chama or scheduler within the ISR,
+// and a change of context happens there. Nenhuma tarefa chama `yield_now`;
+// all of them are loops that never cooperate.
 #![no_std]
 #![no_main]
+
+
 
 use core::{cell::RefCell, sync::atomic::AtomicU32};
 
@@ -21,6 +26,7 @@ mod panic;
 mod context_switch;
 mod scheduler;
 mod task;
+mod tick;
 
 esp_bootloader_esp_idf::esp_app_desc!(); // boot laoder espressif default
 
@@ -60,9 +66,6 @@ extern "C" fn task0_entry() -> ! {
         info!("task 0 running");
         toggle(&LED_TASK0);
         busy_delay_ms(100);
-
-
-        scheduler::yield_now();
     }
 }
 
@@ -73,7 +76,7 @@ extern  "C" fn task1_entry() -> ! {
         busy_delay_ms(300);
         toggle(&LED_TASK1);
         busy_delay_ms(300);
-        scheduler::yield_now();
+        
     }
 }
 
@@ -84,7 +87,6 @@ extern "C" fn task2_entry() -> ! {
         busy_delay_ms(100);
         toggle(&LED_TASK2);
         busy_delay_ms(100);
-        scheduler::yield_now();
     }
 }
 
@@ -117,7 +119,7 @@ fn main() -> ! {
 
 
         info!("step-1: tasks registered, handing over control to the scheduler");
-
+        tick::init(peripherals.SYSTIMER, peripherals.GPIO4);
         scheduler::start();
         
     }
