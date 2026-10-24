@@ -39,6 +39,7 @@ fixing the concept rather than piling up code.
 | 2    | Preemptive round-robin scheduling (timer tick)     | Done   |
 | ...  | Synchronization primitives, priorities, etc.       | Planned |
 
+> Each step is a branch; for example, you can easily access one using `git checkout step-1`.
 
 ### Future goals
 
